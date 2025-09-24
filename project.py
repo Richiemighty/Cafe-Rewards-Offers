@@ -359,6 +359,27 @@ elif section == "Offer Analysis":
     with st.expander("Preview the Informational Offer Time by Transaction time Data"):
         info_by_txn = pd.DataFrame({ "Offer ID": info_with_txn["offer_id_offer"], "Customer ID": info_with_txn["customer_id"], "Recieved Time":info_with_txn["time_offer"], "transactions Time": info_with_txn["time_txn"]})
         st.dataframe(info_by_txn)
+    
+    # Make sure time columns are numeric or datetime
+    # info_by_txn["Recieved Time"] = pd.to_numeric(info_by_txn["Recieved Time"])
+    # info_by_txn["transactions Time"] = pd.to_numeric(info_by_txn["transactions Time"])
+
+    # fig, ax = plt.subplots(figsize=(10, 6))
+
+    # # Plot each customer's timeline
+    # for i, row in info_by_txn.iterrows():
+    #     ax.plot(
+    #         [row["Recieved Time"], row["transactions Time"]],  # x-values
+    #         [row["Customer ID"], row["Customer ID"]],          # y-values (same for a line)
+    #         marker="o"
+    #     )
+
+    # ax.set_title("Offer Received vs Transaction Time per Customer")
+    # ax.set_xlabel("Time")
+    # ax.set_ylabel("Customer ID")
+    # plt.tight_layout()
+    # st.pyplot(fig)
+
 
     st.write("### Visualization: Transactions after Informational Offers")
     # Count how many times each customer transacted after an informational offer
