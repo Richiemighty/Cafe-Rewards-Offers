@@ -7,6 +7,14 @@ import seaborn as sns
 
 
 
+st.set_page_config(
+    page_title="Richie Mighty's Cafe Rewards Project",   
+    page_icon="☕",                       # Can be emoji, path to .png/.ico file
+    layout="wide",                        
+    initial_sidebar_state="expanded"      
+)
+
+
 st.markdown("""
     <style>
     /* Hide radio button circles */
