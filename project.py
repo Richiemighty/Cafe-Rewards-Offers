@@ -62,7 +62,7 @@ st.sidebar.title("Navigation")
 
 section = st.sidebar.radio(
     "Go to:",
-        ["Home", "About the Dataset", "Offer Analysis", "Customer Demographics", "Patterns in Offer Completion"],
+        ["Home", "About the Dataset", "Offer Analysis", "Customer Demographics", "Patterns in Offer Completion", "Additional Insights", "Conclusion"],
         label_visibility="collapsed"  # hides the "Go to:" text
 )
 
@@ -659,3 +659,170 @@ elif section == "Patterns in Offer Completion":
             for x, y in zip(age_stats.index.astype(str), age_stats["completion_rate"]):
                 ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points", xytext=(0, 5), ha="center")
             st.pyplot(fig)
+
+
+
+
+
+
+
+elif section == "Additional Insights":
+    st.header("Final Insights & Extra Analysis")
+    st.write("In this section, I go beyond the research questions to uncover more hidden patterns in the dataset.")
+
+    # --- 1. Spending Patterns ---
+    with st.expander("Spending Patterns"):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            fig, ax = plt.subplots()
+            ax.hist(final_df["amount"].dropna(), bins=30, color="goldenrod", edgecolor="black")
+            ax.set_title("Distribution of Transaction Amounts")
+            ax.set_xlabel("Amount ($)")
+            ax.set_ylabel("Frequency")
+            st.pyplot(fig)
+
+        with col2:
+            avg_spending = final_df.groupby("customer_id")["amount"].mean().dropna()
+            fig, ax = plt.subplots()
+            ax.hist(avg_spending, bins=30, color="teal", edgecolor="black")
+            ax.set_title("Average Spending per Customer")
+            ax.set_xlabel("Average Amount ($)")
+            ax.set_ylabel("Number of Customers")
+            st.pyplot(fig)
+
+    # --- 2. Offer Dynamics ---
+    with st.expander("Offer Dynamics"):
+        col1, col2 = st.columns(2)
+
+        with col1:
+            fig, ax = plt.subplots()
+            final_df["offer_type"].value_counts().plot(kind="bar", ax=ax, color="orchid")
+            ax.set_title("Count of Offer Types")
+            ax.set_ylabel("Count")
+            st.pyplot(fig)
+
+        with col2:
+            fig, ax = plt.subplots()
+            sns.scatterplot(data=final_df, x="difficulty", y="reward_y", hue="offer_type", ax=ax, alpha=0.6)
+            ax.set_title("Reward vs Difficulty by Offer Type")
+            st.pyplot(fig)
+
+
+
+    # --- 3. Channel Effectiveness ---
+    with st.expander("📢 Channel Effectiveness"):
+        st.write("Here we examine the distribution of whether each channel was used (True/False).")
+
+        channels = ["web", "email", "mobile", "social"]
+        cols = st.columns(4)  # one column per channel
+
+        for i, ch in enumerate(channels):
+            with cols[i]:
+                # Count True/False for each channel
+                counts = final_df[ch].value_counts()
+
+                fig, ax = plt.subplots()
+                ax.pie(
+                    counts,
+                    labels=counts.index,
+                    autopct='%1.1f%%',
+                    startangle=90,
+                    colors=["lightcoral", "lightgreen"]
+                )
+                ax.set_title(f"{ch.capitalize()} Channel")
+                st.pyplot(fig)
+
+
+        channels = ["web", "email", "mobile", "social"]
+
+        # Count True/False for each channel
+        channel_counts = pd.DataFrame({ch: final_df[ch].value_counts() for ch in channels}).T
+
+        # Plot grouped bar chart
+        fig, ax = plt.subplots(figsize=(8,5))
+        channel_counts.plot(kind="bar", ax=ax, color=["red", "blue"])
+        ax.set_title("Channel Usage (True vs False)")
+        ax.set_ylabel("Number of Records")
+        ax.set_xlabel("Channels")
+        ax.legend(title="Used?", labels=channel_counts.columns)
+        st.pyplot(fig)
+
+        # Show data in an expander
+        with st.expander("📊 View Channel Usage Table"):
+            st.dataframe(channel_counts)
+
+
+
+    # --- 4. Membership Insights ---
+    with st.expander("Membership Insights"):
+        final_df["member_year"] = final_df["became_member_on"].astype(str).str[:4].astype(int)
+
+        fig, ax = plt.subplots()
+        final_df["member_year"].value_counts().sort_index().plot(kind="bar", ax=ax, color="slateblue")
+        ax.set_title("Customers Joined by Year")
+        ax.set_xlabel("Year")
+        ax.set_ylabel("Number of Customers")
+        st.pyplot(fig)
+
+    # --- 5. Correlation Heatmap ---
+    with st.expander("Correlation Heatmap"):
+        numeric_cols = ["age", "income", "difficulty", "reward_y", "duration"]
+        corr = final_df[numeric_cols].corr()
+
+        fig, ax = plt.subplots(figsize=(8,6))
+        sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
+        ax.set_title("Correlation Heatmap of Key Features")
+        st.pyplot(fig)
+
+
+
+
+elif section == "Conclusion":
+    st.markdown("""
+# Conclusion
+
+This study set out to analyze the effectiveness of various reward offers, customer demographics, and communication channels in influencing offer completion and transactional behavior. Through an in-depth data-driven exploration, several key insights emerged:
+
+### 1. Offer Completion and Effectiveness
+- **Completion Performance:** The overall completion rates varied significantly across offers, ranging from approximately 38% to 70%.  
+- **Top Offers:** The most successful offers were **fafcd668e3743c1bb461111dcafc2a4** (≈70%) and **2298d6c36e964ae4a3e7e9706d1fb8c2** (≈67%), suggesting strong customer engagement with these specific campaigns.  
+- **Offer Type Impact:** Among offer types, **discount** offers achieved the highest completion rate (≈59%), followed by **bogo** offers (≈51%). **Informational** offers recorded a 0% completion rate, indicating that these offers do not have a direct completion metric.
+
+### 2. Informational Offers and Transactions
+Approximately **93.6%** of customers who received and viewed these offers made a purchase afterward. This suggests that while these offers don’t complete in the traditional sense, they successfully drive customer behavior.
+
+Additionally, **71%** of received informational offers were viewed, reflecting strong engagement and visibility across the customer base.
+
+### 3. Customer Demographics
+- **Age:** The average customer age is **53.8 years**, with a fairly wide spread across the dataset.
+- **Income:** The income distribution is approximately normal, with a mean of **\$64,079** , peaking around **\$60,000–\$65,000**.
+- **Gender:** Male customers dominate (≈51%), followed by Female (≈37%). Interestingly, **Female** and **Other** gender groups demonstrated the highest offer completion rates (≈56% and 55% respectively), compared to **Male** customers (≈43%).
+
+### 4. Channel Effectiveness
+Offer delivery was most common via:
+- **Email (54.7%)**
+- **Mobile (50.2%)**
+- **Web (44.1%)**
+- **Social (35.9%)**
+
+Email emerged as the most frequently used and potentially the most reliable distribution channel.
+
+### 5. Customer Growth Trend
+Customer acquisition grew rapidly between **2013 and 2017**, with a notable surge in 2017. However, a decline in 2018 suggests market saturation or strategic shift, signaling the need for renewed engagement strategies.
+
+### 6. Correlation Insights
+A strong relationship was found between **offer difficulty and duration (r = 0.77)**, and a moderate link between **difficulty and reward (r = 0.43)**. These patterns indicate that more demanding offers tend to span longer periods and promise higher rewards. Meanwhile, demographic features (age, income) showed minimal correlation with offer structure, implying that offers are not personalized by these attributes.
+
+---
+
+### Final Summary
+Overall, the study concludes that:
+- Incentive-driven offers (discount and bogo) are the most effective for driving completion.
+- Informational offers, while non-completable, play a crucial role in influencing transactions.
+- Customer engagement varies by gender, favoring Female and Other categories.
+- Email and Mobile remain the most impactful communication channels.
+- The strong growth trend in earlier years demonstrates successful customer acquisition, but future strategies should focus on sustaining engagement and optimizing offer design.
+
+These insights can inform **targeted marketing**, **personalized offer strategies**, and **optimized communication channels** to enhance customer loyalty and business performance.
+""")
