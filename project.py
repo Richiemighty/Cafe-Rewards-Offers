@@ -507,7 +507,7 @@ elif section == "Customer Demographics":
         with col2:
             # KDE Plot (Density Curve)
             fig, ax = plt.subplots(figsize=(6,4))
-            sns.kdeplot(final_df["age"], shade=True, color="purple", ax=ax)
+            sns.kdeplot(final_df["age"], fill=True, color="purple", ax=ax)
             ax.set_title("KDE Plot (Density) of Age")
             ax.set_xlabel("Age")
             st.pyplot(fig)
@@ -518,9 +518,9 @@ elif section == "Customer Demographics":
     # --- Gender Distribution ---
     with st.expander("🚻 Gender Distribution"):
 
-        col1, col2 = st.columns([1,1])
+        col1, col2, col3 = st.columns([1,2,1])
 
-        with col1:
+        with col2:
             fig, ax = plt.subplots()
             ax.pie(gender_counts, labels=gender_counts.index, autopct='%1.1f%%', startangle=90)
             ax.set_title("Gender Distribution of Customers")
